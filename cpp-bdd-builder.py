@@ -76,7 +76,7 @@ class Scenario:
         self.scenario = scenario
         self.group = group
 
-    def __parse_scenario_gtest_name(name):
+    def __parse_scenario_gtest_name(self, name):
         """Parse scenario name to form acceptable by gtest"""
         # strip
         name = name.strip()
@@ -90,9 +90,9 @@ class Scenario:
 
     def parse(self, framework):
         if framework == "gtest":
-            return "TEST(" + self.group + ", " + self.__parse_scenario_gtest_name(self.scenario["scenario"]) + ")\n"
+            return "TEST(" + self.__parse_scenario_gtest_name(self.group) + ", " + self.__parse_scenario_gtest_name(self.scenario["scenario"]) + ")\n"
         else:
-            return "SCENARIO( \"" + self.scenario["scenario"] + "\", \"[" + self.group + "]\")\n"
+            return "SCENARIO(\"" + self.scenario["scenario"] + "\", \"[" + self.group + "]\")\n"
 
 
 class Given:
@@ -104,7 +104,7 @@ class Given:
         if framework == "gtest":
             return "    // Given " + self.scenario["given"] + "\n"
         else:
-            return "    GIVEN( \"" + self.scenario["given"] + "\")\n"
+            return "    GIVEN(\"" + self.scenario["given"] + "\")\n"
 
 
 class When:
@@ -116,7 +116,7 @@ class When:
         if framework == "gtest":
             return "        // When " + self.scenario["when"] + "\n"
         else:
-            return "        WHEN( \"" + self.scenario["when"] + "\")\n"
+            return "        WHEN(\"" + self.scenario["when"] + "\")\n"
 
 
 class Then:
@@ -128,7 +128,7 @@ class Then:
         if framework == "gtest":
             return "            // Then " + self.scenario["then"] + "\n"
         else:
-            return "            THEN( \"" + self.scenario["then"] + "\")\n"
+            return "            THEN(\"" + self.scenario["then"] + "\")\n"
 
 
 class CppBddBuilder:
