@@ -1,0 +1,10 @@
+title: Returns and exchanges go to inventory.
+as-a: As a store owner,
+i-want: to add items back to inventory when they are returned or exchanged,
+so-that: I can track inventory.
+
+scenarios:
+  - scenario: Items returned for refund should be added to inventory.
+    given: that a customer previously bought a black sweater from me
+    when: they return the black sweater for a refund,
+    then: I should have four black sweaters in inventory.
