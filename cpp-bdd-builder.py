@@ -27,7 +27,11 @@ class Title:
         self.spec = spec
 
     def parse(self, framework):
-        return "// Title: " + self.spec["title"] + "\n"
+        try:
+            return "// Title: " + self.spec["title"] + "\n"
+        except KeyError:
+            print("'title' field is needed")
+            exit(1)
 
 
 class AsA:
@@ -36,8 +40,10 @@ class AsA:
         self.spec = spec
 
     def parse(self, framework):
-        return "// As a: " + self.spec["as-a"] + "\n"
-
+        try:
+            return "// As a: " + self.spec["as-a"] + "\n"
+        except KeyError:
+            return "";
 
 class IWant:
     """Represents tests 'I want' description"""
@@ -45,8 +51,10 @@ class IWant:
         self.spec = spec
 
     def parse(self, framework):
-        return "// I want: " + self.spec["i-want"] + "\n"
-
+        try:
+            return "// I want: " + self.spec["i-want"] + "\n"
+        except KeyError:
+            return "";
 
 class SoThat:
     """Represents tests 'so that' description"""
@@ -54,7 +62,10 @@ class SoThat:
         self.spec = spec
 
     def parse(self, framework):
-        return "// So that: " + self.spec["so-that"] + "\n"
+        try:
+            return "// So that: " + self.spec["so-that"] + "\n"
+        except KeyError:
+            return "";
 
 
 def parse_scenario_gtest_name(name):
@@ -89,10 +100,14 @@ class Scenario:
         return name
 
     def parse(self, framework):
-        if framework == "gtest":
-            return "TEST(" + self.__parse_scenario_gtest_name(self.group) + ", " + self.__parse_scenario_gtest_name(self.scenario["scenario"]) + ")\n"
-        else:
-            return "SCENARIO(\"" + self.scenario["scenario"] + "\", \"[" + self.group + "]\")\n"
+        try:
+            if framework == "gtest":
+                return "TEST(" + self.__parse_scenario_gtest_name(self.group) + ", " + self.__parse_scenario_gtest_name(self.scenario["scenario"]) + ")\n"
+            else:
+                return "SCENARIO(\"" + self.scenario["scenario"] + "\", \"[" + self.group + "]\")\n"
+        except KeyError:
+            print("error in 'scenario' field, possibly missing")
+            exit(1)
 
 
 class Given:
@@ -101,10 +116,13 @@ class Given:
         self.scenario = scenario
 
     def parse(self, framework):
-        if framework == "gtest":
-            return "    // Given " + self.scenario["given"] + "\n"
-        else:
-            return "    GIVEN(\"" + self.scenario["given"] + "\")\n"
+        try:
+            if framework == "gtest":
+                return "    // Given " + self.scenario["given"] + "\n"
+            else:
+                return "    GIVEN(\"" + self.scenario["given"] + "\")\n"
+        except KeyError:
+            return ""
 
 
 class When:
@@ -113,10 +131,14 @@ class When:
         self.scenario = scenario
 
     def parse(self, framework):
-        if framework == "gtest":
-            return "        // When " + self.scenario["when"] + "\n"
-        else:
-            return "        WHEN(\"" + self.scenario["when"] + "\")\n"
+        try:
+            if framework == "gtest":
+                return "        // When " + self.scenario["when"] + "\n"
+            else:
+                return "        WHEN(\"" + self.scenario["when"] + "\")\n"
+        except:
+            print("error in 'when' field, possibly missing")
+            exit(1)
 
 
 class Then:
@@ -125,10 +147,14 @@ class Then:
         self.scenario = scenario
 
     def parse(self, framework):
-        if framework == "gtest":
-            return "            // Then " + self.scenario["then"] + "\n"
-        else:
-            return "            THEN(\"" + self.scenario["then"] + "\")\n"
+        try:
+            if framework == "gtest":
+                return "            // Then " + self.scenario["then"] + "\n"
+            else:
+                return "            THEN(\"" + self.scenario["then"] + "\")\n"
+        except:
+            print("error in 'then' field, possibly missing")
+            exit(1)
 
 
 class CppBddBuilder:
@@ -152,22 +178,31 @@ class CppBddBuilder:
         output += SoThat(self.spec).parse(framework)
         output += "\n"
 
-        for scenario in self.spec["scenarios"]:
-            output += Scenario(scenario, self.group).parse(framework)
-            output += "{\n"
-            output += Given(scenario).parse(framework)
-            output += "    {\n"
-            output += "        // Type code here\n\n"
-            output += When(scenario).parse(framework)
-            output += "        {\n"
-            output += "            // Type code here\n\n"
-            output += Then(scenario).parse(framework)
-            output += "            {\n"
-            output += "                // Type code here\n"
-            output += "            }\n"
-            output += "        }\n"
-            output += "    }\n"
-            output += "}\n\n"
+        try:
+            for scenario in self.spec["scenarios"]:
+                output += Scenario(scenario, self.group).parse(framework)
+                output += "{\n"
+                output += Given(scenario).parse(framework)
+                output += "    {\n"
+                output += "        // Type code here\n\n"
+                output += When(scenario).parse(framework)
+                output += "        {\n"
+                output += "            // Type code here\n\n"
+                output += Then(scenario).parse(framework)
+                output += "            {\n"
+                output += "                // Type code here\n"
+                output += "            }\n"
+                output += "        }\n"
+                output += "    }\n"
+                output += "}\n\n"
+
+        except KeyError:
+            print("'scenarios' group is needed")
+            exit(1)
+        except TypeError:
+            print("'scenarios' group can not be empty")
+            exit(1)
+
 
         return output
 
